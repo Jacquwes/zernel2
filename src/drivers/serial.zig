@@ -32,6 +32,7 @@ pub const Serial = struct {
         pub const Scratch = 7;
     };
 
+    /// Initializes the serial port to 38400 baud.
     pub fn init(port: ComPorts) SerialError!void {
         // Disable all interrupts
         Pic.write8(@intFromEnum(port) + RegistersOffsets.InterruptEnable, 0);
