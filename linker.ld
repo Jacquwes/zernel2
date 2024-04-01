@@ -1,4 +1,4 @@
-// https://github.com/limine-bootloader/limine-c-template
+/* https://github.com/limine-bootloader/limine-c-template */
 
 /* Tell the linker that we want an x86_64 ELF64 output file */
 OUTPUT_FORMAT(elf64-x86-64)
