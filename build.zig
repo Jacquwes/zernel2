@@ -9,10 +9,7 @@ pub fn build(b: *std.Build) !void {
 
     const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .Debug });
 
-    const limine_package = b.dependency("limine-zig", .{
-        .target = target,
-        .optimize = optimize,
-    });
+    const limine_package = b.dependency("limine-zig", .{});
     const limine_module = limine_package.module("limine");
 
     const kernel = b.addExecutable(.{
