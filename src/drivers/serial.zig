@@ -34,33 +34,64 @@ pub const Serial = struct {
 
     /// Initializes the serial port to 38400 baud.
     pub fn init(port: ComPorts) SerialError!void {
+        const portValue: u16 = @intFromEnum(port);
+
         // Disable all interrupts
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.InterruptEnable, 0);
+        Pic.write8(portValue + RegistersOffsets.InterruptEnable, 0);
         // Enable DLAB (set baud rate divisor)
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.LineControl, 0x80);
+        Pic.write8(portValue + RegistersOffsets.LineControl, 0x80);
 
         // 38400 baud
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.DivisorLow, 3);
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.DivisorHigh, 0);
+        Pic.write8(portValue + RegistersOffsets.DivisorLow, 3);
+        Pic.write8(portValue + RegistersOffsets.DivisorHigh, 0);
 
         // 8 bits, no parity, one stop bit
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.LineControl, 0x03);
+        Pic.write8(portValue + RegistersOffsets.LineControl, 0x03);
 
         // Enable FIFO, clear them, with 14-byte threshold
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.FifoControl, 0xc7);
+        Pic.write8(portValue + RegistersOffsets.FifoControl, 0xc7);
 
         // IRQs enabled, RTS/DSR set
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.ModemControl, 0x0b);
+        Pic.write8(portValue + RegistersOffsets.ModemControl, 0x0b);
 
         // Set in loopback mode to test the serial chip
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.ModemControl, 0x1e);
+        Pic.write8(portValue + RegistersOffsets.ModemControl, 0x1e);
 
         // Test the serial chip (send byte 0xAE and check if it is received)
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.Data, 0xae);
-        if (Pic.read8(@intFromEnum(port) + RegistersOffsets.Data) != 0xae)
+        Pic.write8(portValue + RegistersOffsets.Data, 0xae);
+        if (Pic.read8(portValue + RegistersOffsets.Data) != 0xae)
             return SerialError.InvalidSerialPort;
 
         // Unset loopback mode
-        Pic.write8(@intFromEnum(port) + RegistersOffsets.ModemControl, 0x0f);
+        Pic.write8(portValue + RegistersOffsets.ModemControl, 0x0f);
+    }
+
+    /// Checks if there is data available to read from the serial port.
+    pub fn is_data_available(port: ComPorts) bool {
+        return Pic.read8(@intFromEnum(port) + RegistersOffsets.LineStatus) & 1 == 1;
+    }
+
+    /// Checks if the serial port is ready to write data.
+    pub fn is_ready_to_write(port: ComPorts) bool {
+        return Pic.read8(@intFromEnum(port) + RegistersOffsets.LineStatus) & 0x20 == 0x20;
+    }
+
+    /// Reads a byte from the serial port.
+    pub fn read(port: ComPorts) u8 {
+        while (!is_data_available(port)) {}
+        return Pic.read8(@intFromEnum(port) + RegistersOffsets.Data);
+    }
+
+    /// Writes a byte to the serial port.
+    pub fn writeByte(port: ComPorts, byte: u8) void {
+        while (!is_ready_to_write(port)) {}
+        Pic.write8(@intFromEnum(port) + RegistersOffsets.Data, byte);
+    }
+
+    /// Writes a string to the serial port.
+    pub fn write(port: ComPorts, string: []const u8) void {
+        for (string) |byte| {
+            writeByte(port, byte);
+        }
     }
 };
