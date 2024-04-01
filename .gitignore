@@ -1,0 +1,3 @@
+# Ignore the zig generated files
+zig-cache
+zig-out
