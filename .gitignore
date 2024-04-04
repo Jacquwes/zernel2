@@ -1,3 +1,7 @@
 # Ignore the zig generated files
 zig-cache
 zig-out
+
+iso_root
+
+zernel2.iso
