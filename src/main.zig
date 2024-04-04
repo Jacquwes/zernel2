@@ -11,8 +11,9 @@ export fn _start() callconv(.C) noreturn {
 
     // Initialize the serial port
     Serial.init(Serial.ComPorts.COM1) catch unreachable;
-    Serial.write(Serial.ComPorts.COM1, "Zernel2 serial communication initialized.\n");
+    Serial.write(Serial.ComPorts.COM1, "Zernel2 serial communication initialized.\n\r");
 
+    // Stop the cpu
     Cpu.disable_interrupts();
     Cpu.halt();
 }
