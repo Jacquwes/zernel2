@@ -1,6 +1,6 @@
-const Cpu = @import("drivers/system/cpu.zig").Cpu;
-const Pic = @import("drivers/system/pic.zig").Pic;
-const Serial = @import("drivers/serial.zig").Serial;
+const Cpu = @import("drivers/system/cpu.zig");
+const Pic = @import("drivers/system/pic.zig");
+const Serial = @import("drivers/serial.zig");
 
 /// This function is the entry point of the kernel.
 /// It is called by the bootloader after the kernel is loaded into memory.
