@@ -127,7 +127,7 @@ pub fn init() void {
 
     write(.COM1, "Setting up GDTR\n");
     const gdtDescriptor = GdtDescriptor{
-        .limit = @sizeOf(@TypeOf(gdtEntries)) - 1,
+        .limit = @sizeOf(GdtEntry) * gdtEntries.len - 1,
         .base = @intFromPtr(&gdtEntries[0]),
     };
 
@@ -137,7 +137,7 @@ pub fn init() void {
     write(.COM1, "Loading GDTR\n");
     asm volatile (
         \\lgdt %[gdt]
-        \\mov %[ds], %rax
+        \\xor %rax, %rax
         \\movq %rax, %ds
         \\movq %rax, %es
         \\movq %rax, %fs
@@ -150,7 +150,6 @@ pub fn init() void {
         \\1:
         :
         : [gdt] "*p" (&gdtDescriptor),
-          [ds] "i" (0x10),
           [cs] "i" (0x08),
         : "memory"
     );
