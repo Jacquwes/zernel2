@@ -3,7 +3,7 @@
 const cpu = @import("cpu.zig");
 
 /// Represents the Gdt.
-pub const GdtDescriptor = packed struct(u80) {
+const GdtDescriptor = packed struct(u80) {
     /// The size of the Gdt.
     limit: u16,
     /// The base address of the Gdt.
@@ -11,7 +11,7 @@ pub const GdtDescriptor = packed struct(u80) {
 };
 
 /// A struct representing an access byte in a Gdt entry.
-pub const DataCodeAccessByte = packed struct(u8) {
+const DataCodeAccessByte = packed struct(u8) {
     accessed: u1,
     read_write: u1,
     direction_conforming: u1,
@@ -22,8 +22,8 @@ pub const DataCodeAccessByte = packed struct(u8) {
 };
 
 /// A struct representing an access byte for a system segment in a Gdt entry.
-pub const SystemAccessByte = packed struct(u8) {
-    pub const SystemSegmentTypeLong = enum(u4) {
+const SystemAccessByte = packed struct(u8) {
+    const SystemSegmentTypeLong = enum(u4) {
         LDT = 0x2,
         Tss64Available = 0x9,
         Tss64Busy = 0xB,
@@ -36,7 +36,7 @@ pub const SystemAccessByte = packed struct(u8) {
 };
 
 /// A struct representing a flags byte in a Gdt entry.
-pub const FlagsByte = packed struct(u4) {
+const FlagsByte = packed struct(u4) {
     _: u1 = 0,
     long_mode: u1,
     size: u1,
@@ -44,7 +44,7 @@ pub const FlagsByte = packed struct(u4) {
 };
 
 /// A struct representing a Gdt entry.
-pub const GdtEntry = packed struct(u64) {
+const GdtEntry = packed struct(u64) {
     limit_low: u16,
     base_low: u24,
     access: DataCodeAccessByte,
@@ -68,7 +68,7 @@ pub const GdtEntry = packed struct(u64) {
 };
 
 /// A struct representing a system Gdt entry.
-pub const SystemGdtEntry = packed struct(u128) {
+const SystemGdtEntry = packed struct(u128) {
     limit_low: u16,
     base_low: u24,
     access: SystemAccessByte,
@@ -79,7 +79,7 @@ pub const SystemGdtEntry = packed struct(u128) {
 };
 
 /// Creates a Gdt entry.
-pub fn createGdtEntry(base: u64, limit: u64, access: DataCodeAccessByte, flags: FlagsByte) GdtEntry {
+fn createGdtEntry(base: u64, limit: u64, access: DataCodeAccessByte, flags: FlagsByte) GdtEntry {
     return GdtEntry{
         .access = access,
         .base_high = @truncate(base >> 24),
@@ -161,7 +161,7 @@ pub fn init() void {
     write(.COM1, "Setting up GDTR done\n");
 }
 
-pub fn getGdtr() GdtDescriptor {
+fn getGdtr() GdtDescriptor {
     var gdtr: GdtDescriptor = .{ .base = 0, .limit = 0 };
     asm volatile ("sgdt %[ret]"
         : [ret] "=m" (gdtr),
