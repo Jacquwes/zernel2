@@ -110,3 +110,16 @@ pub fn putString(string: []const u8) void {
         putChar(char);
     }
 }
+
+pub fn setForegroundColor(color: u32) void {
+    foregroundColor = color;
+}
+
+pub fn setBackgroundColor(color: u32) void {
+    backgroundColor = color;
+}
+
+pub fn setCursor(x: u64, y: u64) void {
+    cursor.x = x;
+    cursor.y = y;
+}
