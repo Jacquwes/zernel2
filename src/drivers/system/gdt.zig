@@ -154,7 +154,20 @@ pub fn init() void {
         : "memory"
     );
 
+    if (gdtDescriptor.base != getGdtr().base or gdtDescriptor.limit != getGdtr().limit) {
+        write(.COM1, "Failed to load GDTR\n");
+        return;
+    }
+
     write(.COM1, "Setting up GDTR done\n");
+}
+
+pub fn getGdtr() GdtDescriptor {
+    var gdtr: GdtDescriptor = .{ .base = 0, .limit = 0 };
+    asm volatile ("sgdt %[ret]"
+        : [ret] "=m" (gdtr),
+    );
+    return gdtr;
 }
 
 const std = @import("std");
