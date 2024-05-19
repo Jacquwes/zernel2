@@ -13,15 +13,16 @@ export fn _start() callconv(.C) noreturn {
 
     // Initialize the serial port
     serial.init(.COM1) catch unreachable;
-    serial.write(.COM1, "Zernel2 serial communication initialized.\n\r");
+    serial.print("\n\nZernel2 serial communication initialized.\n\r", .{});
 
     // Initialize the GDT
     gdt.init();
+    serial.print("GDT initialized.\n\r", .{});
 
     // Initialize the terminal
     terminal.init() catch serial.write(.COM1, "Failed to initialize terminal.\n\r");
     terminal.putString("Zernel2 terminal initialized.\n\r");
-    terminal.putString("_start is at: ");
+    terminal.print("_start is at: {x}\n\r", .{@intFromPtr(&_start)});
 
     // Stop the cpu
     cpu.disable_interrupts();
