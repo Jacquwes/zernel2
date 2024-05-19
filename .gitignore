@@ -5,3 +5,6 @@ zig-out
 iso_root
 
 zernel2.iso
+
+hd.img
+qemu.log
