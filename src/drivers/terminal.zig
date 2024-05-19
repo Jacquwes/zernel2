@@ -68,11 +68,8 @@ pub fn init() !void {
 }
 
 pub fn clear() void {
-    var line = 0;
-
-    while (line < height) : (line += 1) {
-        var column = 0;
-        while (column < width) : (column += 1) {
+    for (0..height) |line| {
+        for (0..width) |column| {
             drawPixel(column, line, backgroundColor);
         }
     }
@@ -91,12 +88,9 @@ pub fn putChar(char: u8) void {
         return;
     }
 
-    var y: u64 = 0;
-
-    while (y < font.fontHeight) : (y += 1) {
+    for (0..font.fontHeight) |y| {
         var pixelMask: u8 = 1;
-        var x: u64 = 0;
-        while (x < font.fontWidth) : (x += 1) {
+        for (0..font.fontWidth) |x| {
             const pixelX = cursor.x * font.fontWidth + (font.fontWidth - x - 1);
             const pixelY = cursor.y * font.fontHeight + y;
 
