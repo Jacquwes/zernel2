@@ -1,5 +1,6 @@
 //! The `terminal` module provides a simple interface for writing text to the screen.
 
+const std = @import("std");
 const limine = @import("limine");
 
 export var framebufferRequest: limine.FramebufferRequest = .{};
@@ -33,6 +34,15 @@ var backgroundColor: u32 = 0x000000;
 var framebuffer: *limine.Framebuffer = undefined;
 
 const font: PsfHeader = @bitCast(fontFile[0..@sizeOf(PsfHeader)].*);
+
+const PrintError = error{};
+const Writer = std.io.Writer(void, PrintError, printCallback);
+
+fn printCallback(context: void, string: []const u8) PrintError!usize {
+    _ = context;
+    putString(string);
+    return string.len;
+}
 
 pub const TerminalError = error{
     InvalidFramebufferRequest,
@@ -109,6 +119,10 @@ pub fn putString(string: []const u8) void {
     for (string) |char| {
         putChar(char);
     }
+}
+
+pub fn print(comptime format: []const u8, args: anytype) void {
+    std.fmt.format(Writer{ .context = {} }, format, args) catch unreachable;
 }
 
 pub fn setForegroundColor(color: u32) void {

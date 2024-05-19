@@ -1,5 +1,7 @@
 //! The serial module provides a simple interface for reading and writing data over a serial port.
 
+const std = @import("std");
+
 const Pic = @import("system/pic.zig");
 
 /// The error type for the serial module.
@@ -95,4 +97,17 @@ pub fn write(port: ComPorts, string: []const u8) void {
     for (string) |byte| {
         writeByte(port, byte);
     }
+}
+
+const Writer = std.io.Writer(@TypeOf(.{}), error{}, printCallBack);
+const writer = Writer{ .context = .{} };
+
+/// Prints a formatted string to the COM1 serial port.
+pub fn print(comptime format: []const u8, args: anytype) void {
+    std.fmt.format(writer, format, args) catch write(.COM1, "Error while formatting string\n");
+}
+
+fn printCallBack(_: @TypeOf(.{}), string: []const u8) error{}!usize {
+    write(.COM1, string);
+    return string.len;
 }
