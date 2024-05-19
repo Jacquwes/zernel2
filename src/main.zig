@@ -15,6 +15,8 @@ export fn _start() callconv(.C) noreturn {
     serial.init(.COM1) catch unreachable;
     serial.write(.COM1, "Zernel2 serial communication initialized.\n\r");
 
+    // Initialize the GDT
+    gdt.init();
 
     // Initialize the terminal
     terminal.init() catch serial.write(.COM1, "Failed to initialize terminal.\n\r");
