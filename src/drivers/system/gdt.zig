@@ -115,8 +115,8 @@ const gdtEntries = [_]GdtEntry{
         .read_write = 1,
         .accessed = 0,
     }, .{
-        .granularity = 1,
-        .size = 1,
+        .granularity = 0,
+        .size = 0,
         .long_mode = 0,
     }),
 };
@@ -143,14 +143,13 @@ pub fn init() void {
         \\movq %rax, %fs
         \\movq %rax, %gs
         \\movq %rax, %ss
-        \\pushq %[cs]
+        \\pushq $0x08
         \\lea 1f(%rip), %rax
         \\pushq %rax
         \\lretq
         \\1:
         :
         : [gdt] "*p" (&gdtDescriptor),
-          [cs] "i" (0x08),
         : "memory"
     );
 
@@ -206,10 +205,10 @@ test "Create kernel data segment" {
         .read_write = 1,
         .accessed = 0,
     }, .{
-        .granularity = 1,
-        .size = 1,
+        .granularity = 0,
+        .size = 0,
         .long_mode = 0,
     });
 
-    try testing.expect(@as(u64, @bitCast(entry)) == 0x00C0_9200_0000_0000);
+    try testing.expect(@as(u64, @bitCast(entry)) == 0x0000_9200_0000_0000);
 }
